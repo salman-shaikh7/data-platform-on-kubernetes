@@ -1,0 +1,31 @@
+replicaCount: 1
+
+versionStoreType: ROCKSDB
+
+rocksdb:
+  storageClassName: local-path
+  storageSize: 1Gi
+
+catalog:
+  enabled: true
+  iceberg:
+    defaultWarehouse: lakehouse
+    warehouses:
+      - name: lakehouse
+        location: s3://iceberg-warehouse
+        configDefaults:
+          s3.endpoint: http://minio.lakehouse-platform.svc.cluster.local:9000
+          s3.path-style-access: "true"
+          s3.region: us-east-1
+
+  storage:
+    s3:
+      defaultOptions:
+        region: us-east-1
+        authType: STATIC
+        endpoint: http://minio.lakehouse-platform.svc.cluster.local:9000
+        pathStyleAccess: true
+        accessKeySecret:
+          name: minio-root-credentials
+          awsAccessKeyId: MINIO_ROOT_USER
+          awsSecretAccessKey: MINIO_ROOT_PASSWORD
