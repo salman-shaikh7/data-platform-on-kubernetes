@@ -12,11 +12,27 @@ A learning project for building a modular data platform on Kubernetes.
 
 ## Architecture direction
 
-```text
-Transactional Database -> CDC -> Kafka -> Iceberg
-                                      ^
-                                      |
-                               Spark / Query Engines
+```mermaid
+flowchart LR
+    subgraph C[Compute Platform]
+        SPARK[Spark / Query Engines]
+    end
+
+    subgraph L[Lakehouse Platform]
+        N[Nessie<br/>Iceberg REST Catalog]
+        S3[(MinIO / S3<br/>Object Storage)]
+        N --> S3
+    end
+
+    subgraph R[Replication Platform]
+        DB[(Transactional<br/>Database)] --> CDC[CDC / Debezium]
+        CDC --> K[Kafka]
+    end
+
+    SPARK --> N
+    SPARK --> S3
+    K --> N
+    K --> S3
 ```
 
 The platforms will be deployed and tested separately because this local Kubernetes cluster has limited capacity. Shared Iceberg storage will remain available while Spark or Kafka is tested.
